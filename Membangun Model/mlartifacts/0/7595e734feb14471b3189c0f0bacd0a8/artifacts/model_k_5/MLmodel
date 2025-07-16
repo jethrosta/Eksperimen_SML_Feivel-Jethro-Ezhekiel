@@ -1,0 +1,41 @@
+artifact_path: model_k_5
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.7
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.5.2
+mlflow_version: 2.19.0
+model_size_bytes: 24468
+model_uuid: d77c3d2ee9064861bceec37ef57ab32b
+run_id: 7595e734feb14471b3189c0f0bacd0a8
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "long", "name": "tahun", "required": true}, {"type": "double",
+    "name": "Garis Kemiskinan", "required": true}, {"type": "double", "name": "Upah
+    Minimum Provinsi", "required": true}, {"type": "double", "name": "Pengeluaran",
+    "required": true}, {"type": "double", "name": "Upah_Rata_rata", "required": true},
+    {"type": "double", "name": "Jenis_Pengeluaran_MAKANAN", "required": true}, {"type":
+    "double", "name": "Jenis_Pengeluaran_NONMAKANAN", "required": true}, {"type":
+    "double", "name": "Jenis_Pengeluaran_TOTAL", "required": true}, {"type": "double",
+    "name": "daerah_PERDESAAN", "required": true}, {"type": "double", "name": "daerah_PERDESAANPERKOTAAN",
+    "required": true}, {"type": "double", "name": "daerah_PERKOTAAN", "required":
+    true}, {"type": "double", "name": "provinsi_Indonesia", "required": true}, {"type":
+    "double", "name": "provinsi_Indonesia Barat", "required": true}, {"type": "double",
+    "name": "provinsi_Indonesia Tengah", "required": true}, {"type": "double", "name":
+    "provinsi_Indonesia Timur", "required": true}]'
+  outputs: '[{"type": "integer", "required": true}]'
+  params: null
+utc_time_created: '2025-07-16 18:37:11.653934'

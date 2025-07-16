@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/0/ffdbb5f9480b41baacf0c742207b7c1b/artifacts
+end_time: 1752691031317
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: ffdbb5f9480b41baacf0c742207b7c1b
+run_name: KMeans_k=4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1752691029337
+status: 3
+tags: []
+user_id: feiveljethroezhekielgmail.com

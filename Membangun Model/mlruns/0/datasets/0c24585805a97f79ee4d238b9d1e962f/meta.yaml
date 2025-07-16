@@ -1,0 +1,19 @@
+digest: fea9bf62
+name: dataset
+profile: '{"num_rows": 4992, "num_elements": 74880}'
+schema: '{"mlflow_colspec": [{"type": "long", "name": "tahun", "required": true},
+  {"type": "double", "name": "Garis Kemiskinan", "required": true}, {"type": "double",
+  "name": "Upah Minimum Provinsi", "required": true}, {"type": "double", "name": "Pengeluaran",
+  "required": true}, {"type": "double", "name": "Upah_Rata_rata", "required": true},
+  {"type": "double", "name": "Jenis_Pengeluaran_MAKANAN", "required": true}, {"type":
+  "double", "name": "Jenis_Pengeluaran_NONMAKANAN", "required": true}, {"type": "double",
+  "name": "Jenis_Pengeluaran_TOTAL", "required": true}, {"type": "double", "name":
+  "daerah_PERDESAAN", "required": true}, {"type": "double", "name": "daerah_PERDESAANPERKOTAAN",
+  "required": true}, {"type": "double", "name": "daerah_PERKOTAAN", "required": true},
+  {"type": "double", "name": "provinsi_Indonesia", "required": true}, {"type": "double",
+  "name": "provinsi_Indonesia Barat", "required": true}, {"type": "double", "name":
+  "provinsi_Indonesia Tengah", "required": true}, {"type": "double", "name": "provinsi_Indonesia
+  Timur", "required": true}]}'
+source: '{"tags": {"mlflow.user": "feiveljethroezhekielgmail.com", "mlflow.source.name":
+  "modelling.py", "mlflow.source.type": "LOCAL", "mlflow.source.git.commit": "29c3dfcb4b89bd71084304775944b6e1f7c9a70f"}}'
+source_type: code
