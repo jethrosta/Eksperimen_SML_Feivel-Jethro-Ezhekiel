@@ -5,131 +5,159 @@
 # 5. Binning
 
 import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
 
-def preprocess_data_jethro_advanced(path_prefix="preprocessing/Dataset/"):
+# Mengunakan Metode Agregasi
+def replace_outliers_with_median(df, column_name):
     """
-    Memuat dan melakukan preprocessing lengkap pada dataset terkait kemiskinan dan upah.
-
-    Langkah-langkah yang dilakukan:
-    1.  Memuat 4 dataset dan menggabungkannya.
-    2.  Membersihkan dan mengubah tipe data.
-    3.  Menangani nilai kosong (meskipun pada kasus ini tidak ada).
-    4.  Melakukan binning pada kolom 'tahun'.
-    5.  Mendeteksi dan menampilkan outlier pada data numerik.
-    6.  Melakukan One-Hot Encoding pada data kategorikal.
-    7.  Melakukan Feature Scaling (StandardScaler) pada data numerik.
-    8.  Menggabungkan hasil scaling dan encoding menjadi DataFrame akhir.
-
-    Args:
-        path_prefix (str): Path ke direktori tempat file-file CSV disimpan.
-
+    Mengganti outliers pada kolom tertentu dengan nilai median menggunakan metode IQR.
+    
+    Parameters:
+    df (pd.DataFrame): DataFrame yang berisi data.
+    column_name (str): Nama kolom yang ingin diproses.
+    
     Returns:
-        pandas.DataFrame: Sebuah DataFrame yang siap digunakan untuk pemodelan.
-                          Mengembalikan None jika file tidak ditemukan.
+    pd.DataFrame: DataFrame dengan outliers yang telah diganti median.
     """
-    try:
-        # **1. Memuat dan Menggabungkan Dataset**
-        garis_kemiskinan_df = pd.read_csv(f"{path_prefix}garisKemiskinan.csv")
-        min_upah_df = pd.read_csv(f"{path_prefix}minUpah.csv")
-        pengeluaran_df = pd.read_csv(f"{path_prefix}pengeluaran.csv")
-        avg_upah_df = pd.read_csv(f"{path_prefix}rataRataUpah.csv")
-        print("✅ Dataset berhasil dimuat.")
+    Q1 = df[column_name].quantile(0.25)  # Kuartil pertama (Q1)
+    Q3 = df[column_name].quantile(0.75)  # Kuartil ketiga (Q3)
+    IQR = Q3 - Q1  # Interquartile Range (IQR)
 
-        # Menggabungkan semua dataframe menjadi satu
-        df_merged = pd.merge(garis_kemiskinan_df, min_upah_df, on=['provinsi', 'tahun', 'daerah'])
-        df_merged = pd.merge(df_merged, pengeluaran_df, on=['provinsi', 'tahun', 'daerah', 'jenis'])
-        df_merged = pd.merge(df_merged, avg_upah_df, on=['provinsi', 'tahun'])
+    lower_bound = Q1 - 1.5 * IQR  # Batas bawah
+    upper_bound = Q3 + 1.5 * IQR  # Batas atas
 
-        # Mengganti nama kolom agar lebih konsisten
-        df_merged.rename(columns={
-            'garis_kemiskinan_x': 'garis_kemiskinan',
-            'jenis': 'Jenis_Pengeluaran',
-            'upah': 'Upah_Rata_rata'
-        }, inplace=True)
-        df_merged.drop(columns=['periode', 'garis_kemiskinan_y'], inplace=True)
-        print("🔄 Data berhasil digabungkan dan dibersihkan.")
+    median_value = df[column_name].median()  # Nilai median
+    
+    # Ganti outlier dengan median menggunakan apply()
+    df[column_name] = df[column_name].apply(lambda x: median_value if x < lower_bound or x > upper_bound else x)
 
-    except FileNotFoundError as e:
-        print(f"❌ Error: File tidak ditemukan. {e}")
-        return None
+    return df
 
-    # **2. Menangani Data Kosong**
-    if df_merged.isnull().sum().sum() > 0:
-        print("Warning: Ditemukan nilai kosong. Anda mungkin perlu menambah strategi penanganan (imputasi).")
-        # Contoh: df_merged.fillna(df_merged.median(), inplace=True)
-    else:
-        print("✅ Tidak ada nilai kosong pada data.")
+def remove_outliers_iqr(df, column):
+    Q1 = df[column].quantile(0.25)
+    Q3 = df[column].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    
+    # Hapus baris yang memiliki outliers
+    df_clean = df[(df[column] >= lower_bound) & (df[column] <= upper_bound)]
+    return df_clean
 
-    # **3. Binning untuk Kolom 'tahun'**
-    bins = [2014, 2017, 2020, 2023]
-    labels = ['2015-2017', '2018-2020', '2021-2023']
-    df_merged['periode_tahun'] = pd.cut(df_merged['tahun'], bins=bins, labels=labels, right=True)
-    print("🔄 Binning pada kolom 'tahun' selesai.")
+def automate_preprocessing():
+    # Load datasets
+    garisKemiskinan_df = pd.read_csv("Dataset/garisKemiskinan.csv")
+    minUpah_df = pd.read_csv("Dataset/minUpah.csv")
+    pengeluaran_df = pd.read_csv("Dataset/pengeluaran.csv")
+    avgUpah_df = pd.read_csv("Dataset/rataRataUpah.csv")
 
-    # **4. Deteksi Outlier**
-    numerical_cols = ['garis_kemiskinan', 'ump', 'pengeluaran', 'Upah_Rata_rata']
-    print("\n📊 Menganalisis Outlier (menggunakan metode IQR)...")
-    for col in numerical_cols:
-        Q1 = df_merged[col].quantile(0.25)
-        Q3 = df_merged[col].quantile(0.75)
-        IQR = Q3 - Q1
-        lower_bound = Q1 - 1.5 * IQR
-        upper_bound = Q3 + 1.5 * IQR
-        outliers = df_merged[(df_merged[col] < lower_bound) | (df_merged[col] > upper_bound)]
-        print(f"  - Kolom '{col}': Ditemukan {len(outliers)} outlier.")
+    # Penyesuaian nama kolom
+    garisKemiskinan_df.rename(columns={'jenis': 'Jenis_Pengeluaran'}, inplace=True)
+    garisKemiskinan_df.drop(columns=['periode'], inplace=True)
+    pengeluaran_df.rename(columns={'jenis': 'Jenis_Pengeluaran'}, inplace=True)
+    avgUpah_df.rename(columns={'upah': 'Upah_Rata_rata'}, inplace=True)
 
-    # Visualisasi boxplot untuk outlier
-    plt.figure(figsize=(15, 8))
-    sns.boxplot(data=df_merged[numerical_cols])
-    plt.title('Boxplot untuk Deteksi Outlier pada Fitur Numerik')
-    plt.ylabel('Nilai')
-    plt.xticks(rotation=45)
-    plt.show()
+    # Gabungkan garisKemiskinan_df dengan minUpah_df
+    merged_df = pd.merge(garisKemiskinan_df, minUpah_df, on=['provinsi', 'tahun'], how='outer')
+    # Gabungkan hasil dengan pengeluaran_df
+    merged_df = pd.merge(merged_df, pengeluaran_df, on=['provinsi', 'tahun', 'Jenis_Pengeluaran', 'daerah'], how='outer')
+    # Gabungkan hasil dengan avgUpah_df
+    merged_df = pd.merge(merged_df, avgUpah_df, on=['provinsi', 'tahun'], how='outer')
+    
+    # Menghapus semua data kosong(Apakah jumlah data akan berkurang drastis?)
+    temp_df = merged_df
+    temp_df = temp_df.dropna()
+    print("Berhasil rename dan drop")
 
-    # **5 & 6. Feature Scaling dan One-Hot Encoding**
-    categorical_cols = ['provinsi', 'daerah', 'Jenis_Pengeluaran', 'periode_tahun']
+    # Mengubah nilai float menjadi bentuk integer
+    # data gk, ump, peng, Upah_Rata_rata
+    temp_df[['gk', 'ump', 'peng', 'Upah_Rata_rata']] = temp_df[['gk', 'ump', 'peng', 'Upah_Rata_rata']].astype(int)
+    # Mengubah nama kolom agar lebih rapih
+    temp_df.rename(columns={'gk': 'Garis Kemiskinan'}, inplace=True)
+    temp_df.rename(columns={'ump': 'Upah Minimum Provinsi'}, inplace=True)
+    temp_df.rename(columns={'peng': 'Pengeluaran'}, inplace=True)
 
-    # Membuat pipeline untuk transformasi
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ('num', StandardScaler(), numerical_cols),
-            ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_cols)
-        ],
-        remainder='passthrough' # Membiarkan kolom lain (seperti 'tahun') tidak diubah
-    )
+    temp_df = replace_outliers_with_median(temp_df, "Garis Kemiskinan")
+    temp_df = replace_outliers_with_median(temp_df, "Upah Minimum Provinsi")
+    temp_df = replace_outliers_with_median(temp_df, "Upah_Rata_rata")
 
-    # Melakukan transformasi
-    processed_data = preprocessor.fit_transform(df_merged)
-    print("\n🔄 Feature Scaling (StandardScaler) dan One-Hot Encoding (OHE) selesai.")
+    # Pilih kolom yang akan distandarisasi
+    columns_to_scale = ["Upah Minimum Provinsi", "Pengeluaran", "Upah_Rata_rata"]
 
-    # Mengambil nama kolom setelah OHE untuk membuat DataFrame baru
-    ohe_feature_names = preprocessor.named_transformers_['cat'].get_feature_names_out(categorical_cols)
-    final_cols = numerical_cols + list(ohe_feature_names) + ['tahun']
+    # Inisialisasi StandardScaler
+    scaler = StandardScaler()
 
-    # Membuat DataFrame hasil proses
-    # Perlu diperhatikan bahwa `processed_data` adalah numpy array (atau sparse matrix)
-    # Untuk kemudahan inspeksi, kita ubah kembali ke DataFrame
-    df_processed = pd.DataFrame(processed_data.toarray() if hasattr(processed_data, "toarray") else processed_data, columns=final_cols)
-    print("✅ DataFrame akhir berhasil dibuat.")
+    # Transformasi data
+    temp_df[columns_to_scale] = scaler.fit_transform(temp_df[columns_to_scale])
+   
+    temp_ohe = temp_df
+    # Inisialisasi encoder
+    ohe = OneHotEncoder(drop=None, sparse_output=False)
 
-    return df_processed
+    # Pilih kolom yang ingin diencode
+    categorical_cols = ["Jenis_Pengeluaran", "daerah"]
 
+    # Transformasi data menjadi array
+    encoded_array = ohe.fit_transform(temp_ohe[categorical_cols])
+
+    # Konversi ke DataFrame
+    encoded_df = pd.DataFrame(encoded_array, columns=ohe.get_feature_names_out(categorical_cols))
+
+    # Gabungkan dengan dataframe asli (tanpa kolom yang diencode)
+    temp_ohe = temp_ohe.drop(columns=categorical_cols).reset_index(drop=True)
+    temp_ohe = pd.concat([temp_ohe, encoded_df], axis=1)
+
+    # Melakukan One Hot Encoding pada Data Provinsi
+    encoder = OneHotEncoder(sparse_output=False)
+    temp_ohe_final = temp_ohe
+    # Definisikan pembagian wilayah
+    indonesia_timur = ["MALUKU", "MALUKU UTARA", "PAPUA", "PAPUA BARAT"]
+    indonesia_tengah = ["KALIMANTAN BARAT", "KALIMANTAN SELATAN", "KALIMANTAN TENGAH", "KALIMANTAN TIMUR", "KALIMANTAN UTARA", 
+                        "BALI", "NUSA TENGGARA BARAT", "NUSA TENGGARA TIMUR", "GORONTALO", 
+                        "SULAWESI BARAT", "SULAWESI SELATAN", "SULAWESI TENGAH", "SULAWESI TENGGARA", "SULAWESI UTARA"]
+    indonesia_barat = ["ACEH", "BENGKULU", "JAMBI", "LAMPUNG", "RIAU", "SUMATERA BARAT", "SUMATERA SELATAN", "SUMATERA UTARA", 
+                    "KEP. BANGKA BELITUNG", "KEP. RIAU", "BANTEN", "DKI JAKARTA", "JAWA BARAT", "JAWA TENGAH", "JAWA TIMUR", "DI YOGYAKARTA"]
+
+    # Buat fungsi untuk mengkategorikan provinsi
+    def categorize_province(province):
+        if province in indonesia_timur:
+            return "Indonesia Timur"
+        elif province in indonesia_tengah:
+            return "Indonesia Tengah"
+        elif province in indonesia_barat:
+            return "Indonesia Barat"
+        else:
+            return "Indonesia"  # Untuk kategori "INDONESIA"
+
+    # Terapkan fungsi pada kolom 'provinsi'
+    temp_ohe_final["provinsi"] = temp_ohe_final["provinsi"].apply(categorize_province)
+
+    # Cek hasilnya
+    print(temp_ohe_final["provinsi"].value_counts())
+    encoded_array = encoder.fit_transform(temp_ohe_final[["provinsi"]])
+
+    # Mengonversi ke DataFrame
+    encoded_df = pd.DataFrame(encoded_array, columns=encoder.get_feature_names_out(["provinsi"]))
+
+    # Gabungkan dengan Data Awal
+    df_encoded = pd.concat([temp_ohe_final, encoded_df], axis=1)
+
+    # Melakukan drop pada bagian provinsi
+    df_encoded = df_encoded.drop(columns=["provinsi"])
+    df_encoded.head()
+
+    
+    return merged_df
 
 if __name__ == "__main__":
     # Panggil fungsi untuk mendapatkan data yang sudah diproses secara lengkap
-    df_final = preprocess_data_jethro_advanced()
+    df_final = automate_preprocessing()
 
     if df_final is not None:
         print("\n### Informasi DataFrame Hasil Preprocessing ###")
         df_final.info()
 
         print("\n### 5 Baris Pertama DataFrame Hasil Preprocessing ###")
-        print(df_final.head())
+        print(df_final.tail())
 
         print(f"\nDimensi DataFrame akhir: {df_final.shape}")
