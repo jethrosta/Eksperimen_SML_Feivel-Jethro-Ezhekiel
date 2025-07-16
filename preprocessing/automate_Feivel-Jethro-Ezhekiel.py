@@ -44,6 +44,17 @@ def remove_outliers_iqr(df, column):
     df_clean = df[(df[column] >= lower_bound) & (df[column] <= upper_bound)]
     return df_clean
 
+# Buat fungsi untuk mengkategorikan provinsi
+def categorize_province(province):
+    if province in indonesia_timur:
+        return "Indonesia Timur"
+    elif province in indonesia_tengah:
+        return "Indonesia Tengah"
+    elif province in indonesia_barat:
+        return "Indonesia Barat"
+    else:
+        return "Indonesia"  # Untuk kategori "INDONESIA"
+
 def automate_preprocessing():
     # Load datasets
     garisKemiskinan_df = pd.read_csv("Dataset/garisKemiskinan.csv")
@@ -118,16 +129,7 @@ def automate_preprocessing():
     indonesia_barat = ["ACEH", "BENGKULU", "JAMBI", "LAMPUNG", "RIAU", "SUMATERA BARAT", "SUMATERA SELATAN", "SUMATERA UTARA", 
                     "KEP. BANGKA BELITUNG", "KEP. RIAU", "BANTEN", "DKI JAKARTA", "JAWA BARAT", "JAWA TENGAH", "JAWA TIMUR", "DI YOGYAKARTA"]
 
-    # Buat fungsi untuk mengkategorikan provinsi
-    def categorize_province(province):
-        if province in indonesia_timur:
-            return "Indonesia Timur"
-        elif province in indonesia_tengah:
-            return "Indonesia Tengah"
-        elif province in indonesia_barat:
-            return "Indonesia Barat"
-        else:
-            return "Indonesia"  # Untuk kategori "INDONESIA"
+    
 
     # Terapkan fungsi pada kolom 'provinsi'
     temp_ohe_final["provinsi"] = temp_ohe_final["provinsi"].apply(categorize_province)
