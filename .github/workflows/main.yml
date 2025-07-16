@@ -40,4 +40,3 @@ jobs:
       # Mengeksekusi file automate_Jethro.py
       - name: Run preprocessing script
         run: python preprocessing/automate_Feivel-Jethro-Ezhekiel.py
-        working-directory: ./preprocessing
