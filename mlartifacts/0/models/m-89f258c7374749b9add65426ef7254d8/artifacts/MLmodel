@@ -1,0 +1,45 @@
+artifact_path: mlflow-artifacts:/0/models/m-89f258c7374749b9add65426ef7254d8/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.7
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.5.1
+is_signature_from_type_hint: false
+mlflow_version: 3.1.1
+model_id: m-89f258c7374749b9add65426ef7254d8
+model_size_bytes: 25067
+model_uuid: m-89f258c7374749b9add65426ef7254d8
+prompts: null
+run_id: 8ddc53b4d8864ee3955f7b4fce3be5a3
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "long", "name": "tahun", "required": true}, {"type": "double",
+    "name": "Garis Kemiskinan", "required": true}, {"type": "double", "name": "Upah
+    Minimum Provinsi", "required": true}, {"type": "double", "name": "Pengeluaran",
+    "required": true}, {"type": "double", "name": "Upah_Rata_rata", "required": true},
+    {"type": "double", "name": "Jenis_Pengeluaran_MAKANAN", "required": true}, {"type":
+    "double", "name": "Jenis_Pengeluaran_NONMAKANAN", "required": true}, {"type":
+    "double", "name": "Jenis_Pengeluaran_TOTAL", "required": true}, {"type": "double",
+    "name": "daerah_PERDESAAN", "required": true}, {"type": "double", "name": "daerah_PERDESAANPERKOTAAN",
+    "required": true}, {"type": "double", "name": "daerah_PERKOTAAN", "required":
+    true}, {"type": "double", "name": "provinsi_Indonesia", "required": true}, {"type":
+    "double", "name": "provinsi_Indonesia Barat", "required": true}, {"type": "double",
+    "name": "provinsi_Indonesia Tengah", "required": true}, {"type": "double", "name":
+    "provinsi_Indonesia Timur", "required": true}]'
+  outputs: '[{"type": "integer", "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2025-07-16 19:08:39.811353'
