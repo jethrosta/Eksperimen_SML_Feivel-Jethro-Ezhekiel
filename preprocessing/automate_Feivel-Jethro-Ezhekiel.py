@@ -6,6 +6,7 @@
 
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
+import os
 
 # Mengunakan Metode Agregasi
 def replace_outliers_with_median(df, column_name):
@@ -46,10 +47,15 @@ def remove_outliers_iqr(df, column):
 
 def automate_preprocessing():
     # Load datasets
-    garisKemiskinan_df = pd.read_csv("Dataset/garisKemiskinan.csv")
-    minUpah_df = pd.read_csv("Dataset/minUpah.csv")
-    pengeluaran_df = pd.read_csv("Dataset/pengeluaran.csv")
-    avgUpah_df = pd.read_csv("Dataset/rataRataUpah.csv")
+    script_dir = os.path.dirname(__file__) # Mendapatkan direktori tempat script berada
+    path_prefix = os.path.join(script_dir, 'Dataset/')
+    print(f"✅ Mencari dataset di: {path_prefix}")
+    
+    garisKemiskinan_df = pd.read_csv(os.path.join(path_prefix, "garisKemiskinan.csv"))
+    minUpah_df = pd.read_csv(os.path.join(path_prefix, "minUpah.csv"))
+    pengeluaran_df = pd.read_csv(os.path.join(path_prefix, "pengeluaran.csv"))
+    avgUpah_df = pd.read_csv(os.path.join(path_prefix, "rataRataUpah.csv"))
+    print("✅ Dataset berhasil dimuat.")
 
     # Penyesuaian nama kolom
     garisKemiskinan_df.rename(columns={'jenis': 'Jenis_Pengeluaran'}, inplace=True)
