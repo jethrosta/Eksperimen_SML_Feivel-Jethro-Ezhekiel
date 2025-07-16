@@ -1,0 +1,42 @@
+name: Python Preprocessing CI
+
+# Pemicu (trigger) workflow
+# Workflow ini akan berjalan setiap kali ada 'push' ke branch 'main'
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Daftar pekerjaan (jobs) yang akan dijalankan
+jobs:
+  # Hanya ada satu job bernama 'build'
+  build:
+    # Menentukan sistem operasi virtual machine yang akan digunakan
+    runs-on: ubuntu-latest
+
+    # Langkah-langkah (steps) yang akan dieksekusi dalam job ini
+    steps:
+      # Langkah 1: Checkout kode dari repositori
+      # Ini akan mengunduh kode Anda ke dalam virtual machine
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Langkah 2: Menyiapkan lingkungan Python
+      # Menginstal Python versi 3.12
+      - name: Set up Python 3.12.7
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      # Langkah 3: Menginstal library yang dibutuhkan
+      # Menjalankan pip install untuk semua library yang ada di skrip Anda
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas scikit-learn matplotlib seaborn
+
+      # Langkah 4: Menjalankan skrip preprocessing
+      # Mengeksekusi file automate_Jethro.py
+      - name: Run preprocessing script
+        run: python automate_Jethro.py
