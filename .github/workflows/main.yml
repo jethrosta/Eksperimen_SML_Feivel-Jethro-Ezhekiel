@@ -39,4 +39,4 @@ jobs:
       # Langkah 4: Menjalankan skrip preprocessing
       # Mengeksekusi file automate_Jethro.py
       - name: Run preprocessing script
-        run: python automate_Feivel Jethro Ezhekiel.py
+        run: python automate_Feivel-Jethro-Ezhekiel.py
