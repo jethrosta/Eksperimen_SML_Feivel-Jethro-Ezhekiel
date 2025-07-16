@@ -153,7 +153,7 @@ def automate_preprocessing():
     df_encoded.head()
 
     
-    return merged_df
+    return df_encoded
 
 if __name__ == "__main__":
     # Panggil fungsi untuk mendapatkan data yang sudah diproses secara lengkap
@@ -164,14 +164,14 @@ if __name__ == "__main__":
         df_final.info()
 
         print("\n### 5 Baris Terakhir DataFrame Hasil Preprocessing ###")
-        print(df_final.tail())
+        print(df_final.head())
 
         print(f"\nDimensi DataFrame akhir: {df_final.shape}")
 
         try:
             # Tentukan path output di direktori yang sama dengan script
             script_dir = os.path.dirname(__file__)
-            output_path = os.path.join(script_dir, 'processed_data.csv')
+            output_path = os.path.join(script_dir, 'IndonesiaWorkfare_preprocessing.csv')
 
             # Ekspor DataFrame ke file CSV
             df_final.to_csv(output_path, index=False)
@@ -180,4 +180,3 @@ if __name__ == "__main__":
 
         except Exception as e:
             print(f"\n❌ Gagal mengekspor DataFrame ke CSV. Error: {e}")
-    
